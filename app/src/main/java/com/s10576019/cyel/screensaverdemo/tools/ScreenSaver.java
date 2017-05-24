@@ -93,6 +93,7 @@ public class ScreenSaver {
         if (savingView == null) {
             savingView = activity.getLayoutInflater().inflate(R.layout.view_screen_saving, null);
         }
+        stopScreenSaving();
 
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -116,8 +117,14 @@ public class ScreenSaver {
     public void stopScreenSaving() {
         Log.i(this.getClass().getName(), "停止螢幕保護");
         //移開螢幕保護頁面
-        ViewGroup viewGroup = (ViewGroup) savingView.getParent();
-        viewGroup.removeView(savingView);
+        if (savingView != null) {
+            ViewGroup viewGroup = (ViewGroup) savingView.getParent();
+            if (viewGroup != null) {
+                viewGroup.removeView(savingView);
+            } else {
+                Log.e(this.getClass().getName(), "savingView沒有parent");
+            }
+        }
         //螢幕恢復亮度
         Log.i(this.getClass().getName(), "恢復螢幕亮度");
         WindowManager.LayoutParams params = activity.getWindow().getAttributes();
