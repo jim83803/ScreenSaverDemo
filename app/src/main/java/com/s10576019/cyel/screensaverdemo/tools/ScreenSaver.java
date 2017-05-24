@@ -41,10 +41,17 @@ public class ScreenSaver {
                             PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "proximityWakeLock");
                 }
 
-                //獲得鎖
+                //確認鎖取得成功
                 if (proximityWakeLock != null) {
-                    proximityWakeLock.acquire();
-                    Log.i(String.valueOf(this), "獲得鎖");
+                    //確認鎖是否是已經獲得的狀態
+                    if (!proximityWakeLock.isHeld()) {
+                        //獲得鎖
+                        proximityWakeLock.acquire();
+                        Log.i(String.valueOf(this), "獲得鎖");
+                    } else {
+                        Log.i(String.valueOf(this), "鎖已獲得，無須再要求一次。");
+                    }
+
                 } else {
                     Log.i(String.valueOf(this), "取得鎖失敗");
                 }
@@ -59,12 +66,21 @@ public class ScreenSaver {
     }
 
     public void stopProximityDetecting() {
-        //釋放鎖
-        if (proximityWakeLock.isHeld()) {
-            proximityWakeLock.release();
-            Log.i(String.valueOf(this), "釋放鎖");
+
+        //檢查wakeLock是否存在
+        if (proximityWakeLock != null) {
+            Log.i(String.valueOf(this), "確認proximityWakeLock已經取得");
+
+            //釋放鎖
+            if (proximityWakeLock.isHeld()) {
+                proximityWakeLock.release();
+                Log.i(String.valueOf(this), "釋放鎖");
+            } else {
+                Log.i(String.valueOf(this), "鎖未曾獲得，無須釋放。");
+            }
+
         } else {
-            Log.i(String.valueOf(this), "鎖未曾獲得，釋放失敗。");
+            Log.i(String.valueOf(this), "proximityWakeLock尚未取得");
         }
     }
 
@@ -126,7 +142,7 @@ public class ScreenSaver {
         }
         cancelScreenSavingDelayed();
         runnableHandler.postDelayed(screenSavingDelayedRunnable, millSeconds);
-        Log.i(this.getClass().getName(), "預約"+millSeconds+"毫秒後開始螢幕保護");
+        Log.i(this.getClass().getName(), "預約" + millSeconds + "毫秒後開始螢幕保護");
     }
 
     public void cancelScreenSavingDelayed() {
