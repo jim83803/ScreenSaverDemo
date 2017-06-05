@@ -7,20 +7,18 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.s10576019.cyel.screensaverdemo.R;
 
-public class ScreenSaver {
+public class ScreenSaver extends CoveringPage{
     private Activity activity;
-    private View savingView;
     private PowerManager.WakeLock proximityWakeLock;
     private Handler runnableHandler;
     private Runnable screenSavingDelayedRunnable;
 
     public ScreenSaver(@NonNull Activity activity) {
+        super(activity);
         this.activity = activity;
     }
 
@@ -90,23 +88,8 @@ public class ScreenSaver {
 
         Log.i(this.getClass().getName(), "開始螢幕保護");
         //換到螢幕保護頁面
-        if (savingView == null) {
-            savingView = activity.getLayoutInflater().inflate(R.layout.view_screen_saving, null);
-        }
-        stopScreenSaving();
+        super.start(R.layout.view_screen_saving);
 
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        activity.getWindow().addContentView(savingView, layoutParams);
-
-        //點擊頁面就恢復操作
-        savingView.setClickable(true);
-        savingView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopScreenSaving();
-            }
-        });
         //螢幕黯淡
         Log.i(this.getClass().getName(), "螢幕黯淡");
         WindowManager.LayoutParams params = activity.getWindow().getAttributes();
@@ -116,15 +99,8 @@ public class ScreenSaver {
 
     public void stopScreenSaving() {
         Log.i(this.getClass().getName(), "停止螢幕保護");
-        //移開螢幕保護頁面
-        if (savingView != null) {
-            ViewGroup viewGroup = (ViewGroup) savingView.getParent();
-            if (viewGroup != null) {
-                viewGroup.removeView(savingView);
-            } else {
-                Log.e(this.getClass().getName(), "savingView沒有parent");
-            }
-        }
+        super.stop();
+
         //螢幕恢復亮度
         Log.i(this.getClass().getName(), "恢復螢幕亮度");
         WindowManager.LayoutParams params = activity.getWindow().getAttributes();
